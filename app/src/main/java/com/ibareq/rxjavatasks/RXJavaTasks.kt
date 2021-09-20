@@ -10,14 +10,21 @@ import java.util.concurrent.TimeUnit
  */
 
 object RXJavaTasks {
-
-
     /**
      * Complete below function
      * let it emit characters form A to Z each 1 second
      */
     fun task1(): Observable<String> {
-        return Observable.
+        val list = mutableListOf<Char>()
+        var c ='A'
+        while (c <= 'Z'){
+            list.add(c)
+            c++
+        }
+        return Observable.fromIterable(list).map { it.toString() }
+            .zipWith(Observable.interval(1,TimeUnit.SECONDS),{ item , _ ->
+                item
+            })
     }
 
     /**
@@ -26,7 +33,7 @@ object RXJavaTasks {
      */
     fun task2(): Observable<String> {
         val mList = listOf("A", "B", "C", "C", "D", "B", "E")
-        return Observable.fromIterable(mList)
+        return Observable.fromIterable(mList).distinct()
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
 
@@ -37,7 +44,7 @@ object RXJavaTasks {
     fun task3(): Observable<String> {
         val firstObservable = Observable.just("A", "B", "C", "D", "E")
         val secondObservable = Observable.range(1,5)
-        return firstObservable.mergeWith(secondObservable)
+        return secondObservable.map { it.toString() }.mergeWith(firstObservable)
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
 
@@ -45,7 +52,7 @@ object RXJavaTasks {
      * add the required operators to emit data from 21 to 80 only
      */
     fun task4(): Observable<Int> {
-        return Observable.range(1,100)
+        return Observable.range(1,100).skip(20).skipLast(20)
             .zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
     }
 
@@ -56,7 +63,9 @@ object RXJavaTasks {
         val firstObservable = Observable.just("A", "B", "C", "D", "E").zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
         val secondObservable = Observable.range(1,5).zipWith(Observable.interval(300, TimeUnit.MILLISECONDS), {item, _ -> item})
 
-        return Observable.
+        return Observable.zip(firstObservable,secondObservable.map { it.toString() }){l1,l2 ->
+            "$l1$l2"
+        }
     }
 
 }
